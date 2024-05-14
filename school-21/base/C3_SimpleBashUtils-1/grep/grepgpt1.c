@@ -93,7 +93,8 @@ void output_line(char* line, int n) {
         putchar(line[i]);
     }
     // Add newline if needed
-    putchar('\n');
+    //putchar('\n');
+    
 }
 
 void processLine(char* line) {
