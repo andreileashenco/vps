@@ -74,6 +74,9 @@ arguments argument_parser(int argc, char** argv) {
     arg.pattern = argv[optind];
     optind++;
   }
+  if (argc - optind == 1){
+    arg.h = 1;
+  }
   return arg;
 }
 
@@ -115,8 +118,11 @@ void processFile(arguments arg, char* path, regex_t* reg) {
     read = getline(&line, &menlen, f);
     line_count++;
     free(line);
-    if (arg.c && !arg.l) printf("%d\n",c);
-    if(arg.l) printf("%s\n",path);
+    if (arg.c && !arg.l) {
+    if (!arg.h) printf("%s",path); 
+    printf("%s\n",c);
+  }
+    if(arg.l && c > 0) printf("%s\n",path);
     fclose(f);
   }
   //вывод из всех файлов

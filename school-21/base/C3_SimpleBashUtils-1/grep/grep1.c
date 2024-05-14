@@ -116,7 +116,7 @@ void processFile(arguments arg, char* path, regex_t* reg) {
     line_count++;
     free(line);
     if (arg.c && !arg.l) printf("%d\n",c);
-    if(arg.l) printf("%s\n",path);
+    if (arg.l && c > 0) printf("%s\n",path);
     fclose(f);
   }
   //вывод из всех файлов
