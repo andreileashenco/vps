@@ -1,130 +1,195 @@
-//#include "grep.h"
+#include "grep.h" // Подключение заголовочного файла grep.h, содержащего объявления для данной программы
 
-#include <getopt.h>
-#include <regex.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <getopt.h> // Подключение библиотеки для обработки опций командной строки
+#include <regex.h> // Подключение библиотеки для работы с регулярными выражениями
+#include <stdio.h> // Подключение стандартной библиотеки для работы с вводом/выводом
+#include <stdlib.h> // Подключение стандартной библиотеки для работы с памятью и управлением программой
+#include <string.h> // Подключение стандартной библиотеки для работы со строками
 
-void pattern_add(arguments* arg, char* pattern) {
-    //?
-}
-
-
-void add_reg_from_file(arguments* arg, char** filepath) {
-  FILE* f = fopen(filepath, "r");  // r режим чтения
-  if (f == NULL) {
-    if (!arg->s) perror(filepath);
-    exit(1);
-  }
-  char* line = NULL;
-  size_t menlen = 0;
-  int read = getline(&line, &menlen, f);
-  while (read != -1) {
-    read = getline(&line, &menlen, f);
-  }
-}
-free(line);
-fclose(f);
-
-arguments argument_parser(int argc, char** argv) { 
-  arguments arg = {0};  
-  int opt; 
-  while ((opt = getopt(argc, argv, "e:ivclnhsf:o")) != -1) {
-    switch (opt) {
-    case 'e': 
-        arg.e = 1; //после флага е регулярные выражения
-        arg.pattern = optarg;// в переменную patern сохраняем глобальную переменную optarg
-        break;
-      case 'i':     
-      //?
-        break;
-      case 'v':     
-        arg.v = 1;  
-        break;
-      case 'c':     
-        arg.c = 1;  
-        break;
-      case 'l':
-        arg.c = 1;           
-        arg.l = 1;
-        break;
-      case 'n':     
-        arg.n = 1;  
-        break;
-      case 'h':     
-        arg.h = 1;  
-        break;
-      case 's':
-        arg.s = 1;
-        break;
-      case 'f':
-        arg.f = 1;
-        break;
-      case 'o':
-        arg.o = 1;
-        break;
-      case '?':
-        perror("ERROR");
-        exit(1);
-        break;
+// Функция для добавления шаблона в структуру аргументов
+void pattern_add(arguments *arg, char *pattern) {
+    int n = strlen(pattern); // Определение длины строки шаблона
+    if (arg->len_pattern == 0) { // Если шаблонов еще нет
+        arg->pattern = malloc(1024 * sizeof(char)); // Выделение начальной памяти под шаблоны
+        arg->pattern[0] = '\0'; // Инициализация пустой строки
+        arg->mem_pattern = 1024; // Установка начального размера памяти
     }
-  }
-  if (arg.pattern == NULL) {
-    arg.pattern = argv[optind];
-    optind++;
-  }
-  return arg;
-}
-
-void output_line(char* line, int n) {//вывод линии по символу
-    for (int i = 0; i < n; i++) {
-        putchar(line[i]);
+    if (arg->mem_pattern < arg->len_pattern + n) { // Если текущего объема памяти недостаточно
+        arg->pattern = realloc(arg->pattern, arg->mem_pattern * 2); // Удвоение объема памяти
+        arg->mem_pattern *= 2; // Обновление информации о размере памяти
     }
-    //?
-}
-//обработка строки
-void processLine(char) {
-//?
-  }
-
-//обработка файла
-void processFile(arguments arg, char* path, regex_t* reg) {
-  FILE* f = fopen(path, "r");
-  if (f == NULL) {
-    if (!arg.s)
-    perror(path);
-    exit(1);
-  }
-  char* line = NULL;
-  size_t menlen = 0;
-  int read = 0;
-  read = getline(&line, &menlen, f);
-  //?
-  while (read != -1) {
-    int result = regexec(reg, line, 0, NULL, 0); 
-    if (result == 0) output_line(line,read);
-    read = getline(&line, &menlen, f);
-    //?
-    free(line);
-    //?
-    fclose(f);
-  }
-  //вывод из всех файлов
-  void output(arguments arg, int argc, char** argv) {
-    regex_t re;
-    int error = regcomp(&re, arg.pattern, 0);
-    if (error) perror("Error");
-    for(int i = optind; i < argc; i++) {
-      processFile[arg, argv[i], &re]
+    if (arg->len_pattern != 0) { // Если уже есть добавленные шаблоны
+        strcat(arg->pattern + arg->len_pattern, "|"); // Добавление разделителя между шаблонами
+        arg->len_pattern++; // Увеличение длины шаблонов на единицу
     }
-  }
-
-//p.e '-e', '-i', '-v','-c','-l','-n'
-//p.3 '-h','-s', '-f', '-o'
-
-int main(int argc, char** argv) {
-  arguments arg = arguments_parser(argc, argv);
-  output(arg, argc,  argv);
-  return 0;
+    arg->len_pattern += sprintf(arg->pattern + arg->len_pattern, "(%s)", pattern); // Добавление нового шаблона
 }
+
+// Функция для добавления шаблонов из файла
+void add_reg_from_file(arguments *arg, char *filepath) {
+    FILE *f = fopen(filepath, "r"); // Открытие файла для чтения
+    if (f == NULL) { // Если файл не удалось открыть
+        if (!arg->s) perror(filepath); // Вывод ошибки, если не установлен режим без сообщений об ошибках
+        exit(1); // Завершение программы с ошибкой
+    }
+
+    char *line = NULL; // Указатель для строки
+    size_t menlen = 0; // Размер буфера для getline
+    ssize_t read; // Количество считанных символов
+    while ((read = getline(&line, &menlen, f)) != -1) { // Чтение строк из файла
+        if (line != NULL && line[read - 1] == '\n') line[read - 1] = '\0'; // Удаление символа новой строки
+        pattern_add(arg, line); // Добавление шаблона из строки
+    }
+    free(line); // Освобождение памяти, выделенной для строки
+    fclose(f); // Закрытие файла
+}
+
+// Парсинг аргументов командной строки
+arguments arguments_parser(int argc, char **argv) {
+    arguments arg = {0}; // Инициализация структуры аргументов нулями
+    int opt; // Переменная для хранения текущей опции
+    while ((opt = getopt(argc, argv, "e:ivclnhsf:o")) != -1) { // Обработка опций командной строки
+        switch (opt) {
+            case 'e':
+                arg.e = 1; // Установка флага наличия опции 'e'
+                pattern_add(&arg, optarg); // Добавление шаблона из аргумента
+                break;
+            case 'i':
+                arg.i = REG_ICASE; // Установка флага игнорирования регистра
+                break;
+            case 'v':
+                arg.v = 1; // Установка флага инверсии поиска
+                break;
+            case 'c':
+                arg.c = 1; // Установка флага подсчета совпадений
+                break;
+            case 'l':
+                arg.l = 1; // Установка флага вывода только имен файлов
+                break;
+            case 'n':
+                arg.n = 1; // Установка флага вывода номеров строк
+                break;
+            case 'h':
+                arg.h = 1; // Установка флага подавления вывода имен файлов
+                break;
+            case 's':
+                arg.s = 1; // Установка флага беззвучного режима
+                break;
+            case 'f':
+                arg.f = 1; // Установка флага чтения шаблонов из файла
+                add_reg_from_file(&arg, optarg); // Добавление шаблонов из указанного файла
+                break;
+            case 'o':
+                arg.o = 1; // Установка флага вывода только совпавших частей строки
+                break;
+            case '?':
+                perror("ERROR"); // Вывод сообщения об ошибке при некорректной опции
+                exit(1); // Завершение программы с ошибкой
+                break;
+        }
+    }
+    if (arg.len_pattern == 0) { // Если шаблоны не были добавлены
+        pattern_add(&arg, argv[optind]); // Добавление шаблона из аргумента командной строки
+        optind++; // Переход к следующему аргументу
+    }
+    if (argc - optind == 1) { // Если остался один аргумент
+        arg.h = 1; // Установка флага подавления вывода имен файлов
+    }
+    return arg; // Возврат структуры аргументов
+}
+
+// Функция для вывода строки
+void output_line(char *line, int n) {
+    if (line != NULL && n > 0) { // Если строка не пуста
+        for (int i = 0; i < n; i++) { // Итерация по символам строки
+            putchar(line[i]); // Вывод каждого символа
+        }
+        if (line[n - 1] != '\n') putchar('\n'); // Добавление символа новой строки, если его нет
+    }
+}
+
+// Функция для вывода совпадающих частей строки
+void print_match(regex_t *re, char *line) {
+    regmatch_t match; // Структура для хранения информации о совпадении
+    int offset = 0; // Смещение для поиска совпадений в строке
+    while (1) {
+        int result = regexec(re, line + offset, 1, &match, 0); // Поиск совпадения
+        if (result != 0) {
+            break; // Прекращение цикла при отсутствии совпадений
+        }
+        if (match.rm_eo != match.rm_so) {
+            for (int i = match.rm_so; i < match.rm_eo; i++) { // Итерация по символам совпадения
+                putchar(line[offset + i]); // Вывод символа совпадения
+            }
+            putchar('\n'); // Добавление новой строки после совпадения
+            offset += match.rm_eo; // Обновление смещения
+        } else {
+            offset++; // Увеличение смещения для предотвращения зацикливания на нулевой длине совпадения
+        }
+    }
+}
+
+// Функция для обработки файла
+void process_file(arguments arg, char *path, regex_t *reg) {
+    FILE *f = fopen(path, "r"); // Открытие файла для чтения
+    if (f == NULL) {
+        if (!arg.s) perror(path); // Вывод ошибки, если не установлен режим без сообщений об ошибках
+        exit(1); // Завершение программы с ошибкой
+    }
+    char *line = NULL; // Указатель для строки
+    size_t menlen = 0; // Размер буфера для getline
+    ssize_t read; // Количество считанных символов
+    int line_count = 0; // Счетчик строк
+    int c = 0; // Счетчик совпадений
+
+    while ((read = getline(&line, &menlen, f)) != -1) { // Чтение строк из файла
+        int result = regexec(reg, line, 0, NULL, 0); // Проверка строки на соответствие регулярному выражению
+
+        if ((result == 0 && !arg.v) || (arg.v && result != 0)) { // Условие для вывода строки в зависимости от флага инверсии
+            if (!arg.c && !arg.l) { // Если не установлен флаг подсчета и флаг вывода имен файлов
+                if (!arg.h) printf("%s:", path); // Вывод имени файла, если не установлен флаг подавления имен файлов
+                if (arg.n) printf("%d:", line_count + 1); // Вывод номера строки
+                if (arg.o) {
+                    print_match(reg, line); // Вывод совпавших частей строки
+                } else {
+                    output_line(line, read); // Вывод всей строки
+                }
+            }
+            c++; // Увеличение счетчика совпадений
+        }
+        line_count++; // Увеличение счетчика строк
+    }
+
+    free(line); // Освобождение памяти, выделенной для строки
+    if (arg.c && !arg.l) { // Если установлен флаг подсчета и не установлен флаг вывода имен файлов
+        if (!arg.h) printf("%s: ", path); // Вывод имени файла, если не установлен флаг подавления имен файлов
+        printf("%d\n", c); // Вывод количества совпадений
+    }
+
+    if (arg.l && c > 0) { // Если установлен флаг вывода имен файлов и есть совпадения
+        printf("%s\n", path); // Вывод имени файла
+    }
+    fclose(f); // Закрытие файла
+}
+
+// Функция для вывода результатов
+void output(arguments arg, int argc, char **argv) {
+    regex_t re; // Структура для хранения скомпилированного регулярного выражения
+    int error = regcomp(&re, arg.pattern, REG_EXTENDED | arg.i); // Компиляция регулярного выражения
+    if (error) {
+        perror("Error"); // Вывод ошибки при неудачной компиляции
+    }
+    for (int i = optind; i < argc; i++) { // Итерация по всем аргументам командной строки после опций
+        process_file(arg, argv[i], &re); // Обработка каждого файла
+    }
+    regfree(&re); // Освобождение ресурсов, выделенных для регулярного выражения
+}
+
+// Точка входа в программу
+int main(int argc, char **argv) {
+    arguments arg = arguments_parser(argc, argv); // Парсинг аргументов командной строки
+    output(arg, argc, argv); // Вывод результатов
+    //free(arg.pattern); // Освобождение памяти, выделенной для шаблонов
+    return 0; // Завершение программы с успешным статусом
+}
+
