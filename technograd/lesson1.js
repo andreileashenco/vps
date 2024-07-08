@@ -12,7 +12,7 @@
 
 let a = "" + 1 + 0//10
 let b ="" - 1 + 0//10
-let c = true + false//flase
+let c = true + false//false
 let d = 6 / "3"//
 let e = "2" * "3"
 let f = 4 + 5 + "px"
@@ -38,3 +38,32 @@ console.log(m);
 console.log(n);
 console.log(o);
 console.log(p);
+
+let a = 200;
+if (( a >= 100 && a <= 999) || (a >= -100 && a <= -999)) { 
+    console.log('трехзначное')
+}else { 
+    console.log("не трехзначное")
+}
+
+let price = 1001;
+let status = 'vip';
+if ( price > 1000) {
+        if ( price > 1000 && status ==='vip' ) { 
+            console.log('discount 10%')
+        }else {
+            console.log('discount 5%')
+        }
+}else {
+    console.log('Price 100%');
+}
+day = 3;
+let status = (day >=6)?'Выходной':'рабочий'
+console.log(day)
+
+let count = 0;
+while (count <= 100 ) {
+    if (count % 2 ===0){
+    console.log(count)
+    }
+}

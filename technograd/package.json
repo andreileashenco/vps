@@ -1,0 +1,20 @@
+{
+    "name": "les4",
+    "version": "1.0.0",
+    "main": "lesson4_hw.js",
+    "scripts": {
+        "test": "console.log('hello')",
+        "start": "node server.js",
+        "dev": "nodemon rest.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "nodemon": "^2.0.15"
+    },
+    "description": "",
+    "dependencies": {
+        "express": "^4.19.2",
+        "nodemon": "^3.1.3"
+    }
+}

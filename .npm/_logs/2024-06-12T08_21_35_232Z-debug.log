@@ -1,0 +1,22 @@
+0 info it worked if it ends with ok
+1 warn npm npm does not support Node.js v10.24.0
+2 warn npm You should probably upgrade to a newer version of node as we
+3 warn npm can't make any promises that npm will work with this version.
+4 warn npm Supported releases of Node.js are the latest release of 4, 6, 7, 8, 9.
+5 warn npm You can find the latest version at https://nodejs.org/
+6 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'run', 'dev' ]
+7 info using npm@5.8.0
+8 info using node@v10.24.0
+9 verbose stack Error: ENOENT: no such file or directory, open '/home/andrew/technograd/package.json'
+10 verbose cwd /home/andrew/technograd
+11 verbose Linux 4.19.0-23-amd64
+12 verbose argv "/usr/bin/node" "/usr/bin/npm" "run" "dev"
+13 verbose node v10.24.0
+14 verbose npm  v5.8.0
+15 error path /home/andrew/technograd/package.json
+16 error code ENOENT
+17 error errno -2
+18 error syscall open
+19 error enoent ENOENT: no such file or directory, open '/home/andrew/technograd/package.json'
+20 error enoent This is related to npm not being able to find a file.
+21 verbose exit [ -2, true ]
