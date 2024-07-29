@@ -296,11 +296,11 @@ ws11
 
 ![37.png](img/37.png)
 
-ws2
+ws21
 
 ![38.png](img/38.png)
 
-sw3
+ws22
 
 ![39.png](img/39.png)
 
