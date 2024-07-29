@@ -274,15 +274,15 @@ sw1
 
 sw2
 
-![34.png](img/33.png)
+![33.png](img/33.png)
 
 sw3
 
-![37.png](img/34.png)
+![34.png](img/34.png)
 
 r1
 
-![38.png](img/35.png)
+![35.png](img/35.png)
 
 r2
 
