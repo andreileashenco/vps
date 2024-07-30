@@ -485,4 +485,5 @@ tcpdump отловил запрос на r1
      Файл resolv.conf содержит информацию о настройках DNS (Domain Name System) в операционной системе Linux. Он указывает системе, какие DNS-серверы использовать для разрешения доменных имен в IP-адреса.
      
      - Перезагружаем службу DHCP командой systemctl restart isc-dhcp-server  
-     ![69.png](img/69.png)
+
+![69.png](img/69.png)
